@@ -22,21 +22,13 @@ class ArtworkController extends Controller
 
     public function store(Request $request)
     {
-        Artwork::create($request->all());
-        $request->validate([
-            'title' => 'required',
-            'creation_year' => 'required',
-            'category' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        $image = $request->file("image")->store("images", "public");
+        $artwork = Artwork::create([
+            "title"=>$request->title,
+            "creation_year"=>$request->creation_year,
+            "category"=>$request->category,
+            "image"=>$image,
         ]);
-        $imageName = time().'.'.$request->image->extension();
-        $request->image->move(public_path('images'), $imageName);
-        $artwork = new artwork();
-        $artwork->title = $request->title;
-        $artwork->creation_year = $request->creation_year;
-        $artwork->category = $request->category;
-        $artwork->image = 'images/'.$imageName;
-        $artwork->save();
 
         return redirect('artworks')->with('success', 'Artwork created successfully.');
     }
